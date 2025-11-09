@@ -1,43 +1,45 @@
 'use client';
 import { useState } from 'react';
+import Hero from '../components/Hero';
 import RiskBar from '../components/RiskBar';
+import ConfidenceBar from '../components/ConfidenceBar';
 import ResultCard from '../components/ResultCard';
 import { initFirebase, logAnalyzeEvent, logToRealtimeDB, hashUrl } from '../lib/firebaseClient';
 initFirebase();
 
-export default function Home() {
-  const [url, setUrl] = useState('');
-  const [result, setResult] = useState<any|null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error,setError]=useState(null);
+export default function Page(){
+  const [url,setUrl]=useState('');
+  const [result,setResult]:any=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [anonLogging,setAnonLogging]=useState(true);
 
-  async function analyze() {
-    setLoading(true); setError(null); setResult(null);
-    try {
+  async function analyze(){ setLoading(true); setResult(null);
+    try{
       logAnalyzeEvent();
-      const res = await fetch('/api/analyze', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ url }) });
+      const res = await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error||'Analyze failed');
-      const h = await hashUrl(url);
-      await logToRealtimeDB({ urlHash: h, verdict: data.verdict, score: data.score, ts: Date.now() }).catch(()=>{});
+      if(!res.ok) throw new Error(data.error||'Analysis failed');
       setResult(data);
-    } catch(e:any) { setError(e.message||String(e)); } finally { setLoading(false); }
+      const h = anonLogging ? await hashUrl(url) : null;
+      try{ await logToRealtimeDB({ urlHash: h, verdict: data.verdict, score: data.score, category: data.category, ts: Date.now() }); }catch(e){}
+    }catch(e:any){ alert(e.message||String(e)); } finally{ setLoading(false); }
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-slate-800 p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold">Analyze a URL</h2>
-        <p className="text-sm text-gray-400">Paste a single URL and get an AI + heuristic powered risk analysis.</p>
+      <Hero />
+      <div className="glass p-6">
+        <h3 className="text-lg font-semibold">Analyze a URL</h3>
+        <p className="text-sm text-gray-300">Paste a single URL and get an AI + heuristic powered factual analysis.</p>
         <div className="mt-4 flex gap-3">
-          <input value={url} onChange={(e)=>setUrl(e.target.value)} placeholder="https://example.com" className="flex-1 p-3 rounded bg-slate-700/50 border border-slate-600"/>
-          <button onClick={analyze} disabled={loading} className="px-4 py-2 bg-blue-600 rounded">{loading?'Analyzing...':'Analyze'}</button>
+          <input className="flex-1 p-3 rounded bg-transparent border border-slate-700" placeholder="https://example.com" value={url} onChange={e=>setUrl(e.target.value)} />
+          <button className="btn bg-gradient-to-r from-violet-600 to-cyan-500 text-white" onClick={analyze} disabled={loading}>{loading?'Analyzing...':'Analyze'}</button>
         </div>
+        <div className="mt-3 flex items-center gap-4"><label className="text-sm">Anonymous logging</label><input type="checkbox" checked={anonLogging} onChange={e=>setAnonLogging(e.target.checked)} /></div>
       </div>
 
       <RiskBar score={result?.score ?? null} />
-
-      {error && <div className="text-red-400">{String(error)}</div>}
+      <ConfidenceBar confidence={result?.confidence ?? null} />
       {result && <ResultCard result={result} />}
     </div>
   );

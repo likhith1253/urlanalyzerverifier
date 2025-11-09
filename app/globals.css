@@ -1,6 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+:root{ --glass-bg: rgba(255,255,255,0.06); --glass-border: rgba(255,255,255,0.08); }
 html,body,#__next{height:100%}
-body{@apply bg-gray-900 text-gray-100}
-.light body{@apply bg-gray-50 text-gray-900}
+body{@apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;}
+.light body{@apply bg-gradient-to-br from-white via-gray-100 to-white text-gray-900; --glass-bg: rgba(255,255,255,0.6); --glass-border: rgba(0,0,0,0.06);}
+.glass { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(6px); border-radius: 12px; }
+.btn { @apply px-4 py-2 rounded-md font-medium; }
+.small { font-size: 0.9rem; }

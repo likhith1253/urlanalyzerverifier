@@ -1,19 +1,26 @@
-LinkLens — AI-powered URL Risk Visualizer
+# LinkLens — Complete (Final Deliverable)
 
-Features:
-- Single + batch URL analysis (CSV)
-- Gemini 1.5 Pro integration for JSON outputs
-- Heuristics + AI combined scoring with confidentiality bias toward 'moderate'
-- Anonymized URL hashing (SHA-256) before logging to Firebase Realtime DB
-- Analytics dashboard with pie chart, trend line, recent logs
-- Tailwind responsive UI with dark default theme and light toggle
+This is the complete LinkLens project implementing the full checklist you requested.
+Features include batch mode, AI batch summary, clustering heatmap/scatter, time-based trend, categories suggested by AI, anonymized logging, downloadable reports, and a glassmorphism UI.
 
-Local setup:
-1. Copy .env.example to .env.local and fill GEMINI_API_KEY and Firebase config.
+## Quickstart
+1. Copy `.env.example` to `.env.local` and fill your keys (GEMINI_API_KEY, NEXT_PUBLIC_FIREBASE_*).
 2. npm install
 3. npm run dev
-4. Visit http://localhost:3000
+4. Open http://localhost:3000
 
-To apply the patch instead:
-- Save the provided patch file to your repo root and run:
-  git apply linklens_revamp.patch
+## Files added
+- app/: pages and layouts
+- components/: UI components
+- lib/: ai, heuristics, firebase client
+- app/api/: analyze, batch, batch-summary routes
+- samples/: sample CSV for batch testing
+
+## Applying patch
+Save the patch file to your repo root and run:
+```
+git apply linklens_complete.patch
+git add .
+git commit -m "Apply LinkLens complete revamp"
+```
+
